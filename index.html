@@ -16,11 +16,23 @@
 
 <body>
     <script>
-        var game = new Phaser.Game(480, 320, Phaser.CANVAS, null, {
+        let game = new Phaser.Game(480, 320, Phaser.CANVAS, null, {
             preload: preload, create: create, update: update
         });
-        function preload() { }
-        function create() { }
+        let ball;
+        //preload takes care of preloading the assets
+        function preload() {
+            game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            game.scale.pageAlignHorizontally = true;
+            game.scale.pageAlignVertically = true;
+            game.stage.backgroundColor = '#eee'; //kolor tła
+            game.load.image('ball', 'img/ball.png'); //obrazek piłki
+        }
+        //create is executed once when everything is loaded and ready
+        function create() {
+            ball = game.add.sprite(50, 50, 'ball');
+        }
+        //update is executed on every frame
         function update() { }
     </script>
 </body>
