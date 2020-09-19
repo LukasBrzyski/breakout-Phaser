@@ -62,6 +62,7 @@
         //update is executed on every frame
         function update() {
             game.physics.arcade.collide(ball, paddle); //rakietka wykrywa zderzenie z piłką
+            game.physics.arcade.collide(ball, bricks, ballHitBrick); //trzeci opcjonalny parametr to funkcja ballHitBrick, która uruchamia się przy zderzeniu piłki z cegiełką
             paddle.x = game.input.x || game.world.width * 0.5; //pozycja rakietki wprowadzana jest przez użytkownika || startowa pozycja na środku planszy
         }
 
@@ -86,7 +87,7 @@
                     // tworzenie nowej cegiełki i dodanie jej do grupy
                     let brickX = (c * (brickInfo.width + brickInfo.padding)) + brickInfo.offset.left;
                     let brickY = (r * (brickInfo.height + brickInfo.padding)) + brickInfo.offset.top;
-                    
+
                     newBrick = game.add.sprite(brickX, brickY, 'brick');
                     game.physics.enable(newBrick, Phaser.Physics.ARCADE);
                     newBrick.body.immovable = true;
@@ -94,6 +95,10 @@
                     bricks.add(newBrick);
                 }
             }
+        }
+
+        function ballHitBrick(ball, brick) {
+            brick.kill();
         }
     </script>
 </body>
