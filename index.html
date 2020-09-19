@@ -24,6 +24,8 @@
         let bricks;
         let newBrick;
         let brickInfo;
+        let scoreText;
+        let score = 0;
 
         //preload takes care of preloading the assets
         function preload() {
@@ -58,6 +60,7 @@
             paddle.body.immovable = true; //rakietka nie opada po odbiciu piłki
 
             initBricks();
+            scoreText = game.add.text(5, 5, 'Points: 0', { font: '18px Arial', fill: '#0095DD' });
         }
         //update is executed on every frame
         function update() {
@@ -99,6 +102,8 @@
 
         function ballHitBrick(ball, brick) {
             brick.kill();
+            score += 10;
+            scoreText.setText('Points: ' + score);
         }
     </script>
 </body>
