@@ -30,12 +30,13 @@
         }
         //create is executed once when everything is loaded and ready
         function create() {
+            game.physics.startSystem(Phaser.Physics.ARCADE); //silnik Arcade Physics
             ball = game.add.sprite(50, 50, 'ball');
+            game.physics.enable(ball, Phaser.Physics.ARCADE); //udostępnienie piłki do silnika
+            ball.body.velocity.set(150, 150); //prędkość
         }
         //update is executed on every frame
         function update() {
-            ball.x += 1;
-            ball.y += 1;
         }
     </script>
 </body>
