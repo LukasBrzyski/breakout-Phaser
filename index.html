@@ -20,6 +20,8 @@
             preload: preload, create: create, update: update
         });
         let ball;
+        let paddle;
+
         //preload takes care of preloading the assets
         function preload() {
             game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -27,18 +29,26 @@
             game.scale.pageAlignVertically = true;
             game.stage.backgroundColor = '#eee'; //kolor tła
             game.load.image('ball', 'img/ball.png'); //obrazek piłki
+            game.load.image('paddle', 'img/paddle.png'); //obrazek rakietki
         }
         //create is executed once when everything is loaded and ready
         function create() {
             game.physics.startSystem(Phaser.Physics.ARCADE); //silnik Arcade Physics
-            ball = game.add.sprite(50, 50, 'ball');
+            ball = game.add.sprite(game.world.width*0.5, game.world.height-25, 'ball'); //piłka na środku szerokości planszy i na wysokości mniejszej o 25 od wysokości planszy
+            ball.anchor.set(0.5); //kluczowym punktem piłki jest teraz jej środek
             game.physics.enable(ball, Phaser.Physics.ARCADE); //udostępnienie piłki do silnika
             ball.body.collideWorldBounds = true; //piłka nie przechodzi przez ściany
             ball.body.bounce.set(1); //piłka odbija się od ścian (prędkość po odbiciu)
-            ball.body.velocity.set(150, 150); //prędkość i kierunek
+            ball.body.velocity.set(150, -150); //prędkość i kierunek
+            paddle = game.add.sprite(game.world.width*0.5, game.world.height-5, 'paddle'); //rakietka na środku szerokości planszy i na wysokości mniejszej o 5 od wysokości planszy
+            paddle.anchor.set(0.5, 1); //kluczowym punktem rakietki jest teraz jej środek, a nie lewy górny róg
+            game.physics.enable(paddle, Phaser.Physics.ARCADE); //udostępnienie rakietki do silnika
+            paddle.body.immovable = true; //rakietka nie opada po odbiciu piłki
         }
         //update is executed on every frame
         function update() {
+            game.physics.arcade.collide(ball, paddle); //rakietka wykrywa zderzenie z piłką
+            paddle.x = game.input.x || game.world.width*0.5; //pozycja rakietki wprowadzana jest przez użytkownika || startowa pozycja na środku planszy
         }
     </script>
 </body>
