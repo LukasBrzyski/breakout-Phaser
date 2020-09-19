@@ -21,6 +21,9 @@
         });
         let ball;
         let paddle;
+        let bricks;
+        let newBrick;
+        let brickInfo;
 
         //preload takes care of preloading the assets
         function preload() {
@@ -29,7 +32,8 @@
             game.scale.pageAlignVertically = true;
             game.stage.backgroundColor = '#eee'; //kolor tła
             game.load.image('ball', 'img/ball.png'); //obrazek piłki
-            game.load.image('paddle', 'img/paddle.png'); //obrazek rakietki
+            game.load.image('paddle', 'img/paddle.png');
+            game.load.image('brick', 'img/brick.png');
         }
         //create is executed once when everything is loaded and ready
         function create() {
@@ -52,11 +56,44 @@
             paddle.anchor.set(0.5, 1); //kluczowym punktem rakietki jest teraz jej środek, a nie lewy górny róg
             game.physics.enable(paddle, Phaser.Physics.ARCADE); //udostępnienie rakietki do silnika
             paddle.body.immovable = true; //rakietka nie opada po odbiciu piłki
+
+            initBricks();
         }
         //update is executed on every frame
         function update() {
             game.physics.arcade.collide(ball, paddle); //rakietka wykrywa zderzenie z piłką
             paddle.x = game.input.x || game.world.width * 0.5; //pozycja rakietki wprowadzana jest przez użytkownika || startowa pozycja na środku planszy
+        }
+
+        function initBricks() {
+            brickInfo = {
+                width: 50,
+                height: 20,
+                count: {
+                    row: 3,
+                    col: 7
+                },
+                offset: {
+                    top: 50,
+                    left: 60
+                },
+                padding: 10
+            }; //obiekt brickInfo zawiera wszystkie niezbędne informacje cegiełkach
+            bricks = game.add.group();
+
+            for (c = 0; c < brickInfo.count.col; c++) {
+                for (r = 0; r < brickInfo.count.row; r++) {
+                    // tworzenie nowej cegiełki i dodanie jej do grupy
+                    let brickX = (c * (brickInfo.width + brickInfo.padding)) + brickInfo.offset.left;
+                    let brickY = (r * (brickInfo.height + brickInfo.padding)) + brickInfo.offset.top;
+                    
+                    newBrick = game.add.sprite(brickX, brickY, 'brick');
+                    game.physics.enable(newBrick, Phaser.Physics.ARCADE);
+                    newBrick.body.immovable = true;
+                    newBrick.anchor.set(0.5);
+                    bricks.add(newBrick);
+                }
+            }
         }
     </script>
 </body>
