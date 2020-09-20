@@ -37,15 +37,17 @@
             game.scale.pageAlignHorizontally = true;
             game.scale.pageAlignVertically = true;
             game.stage.backgroundColor = '#eee'; //kolor tła
-            game.load.image('ball', 'img/ball.png'); //obrazek piłki
+            //game.load.image('ball', 'img/ball.png'); //obrazek piłki
             game.load.image('paddle', 'img/paddle.png');
             game.load.image('brick', 'img/brick.png');
+            game.load.spritesheet('ball', 'img/wobble.png', 20, 20); //spritesheet czyli zbiór kilku obrazków piłki
         }
         //create is executed once when everything is loaded and ready
         function create() {
             game.physics.startSystem(Phaser.Physics.ARCADE); //silnik Arcade Physics
             game.physics.arcade.checkCollision.down = false; // piłka nie reaguje na dolną ścianę
             ball = game.add.sprite(game.world.width * 0.5, game.world.height - 25, 'ball'); //piłka na środku szerokości planszy i na wysokości mniejszej o 25 od wysokości planszy
+            ball.animations.add('wobble', [0, 1, 0, 2, 0, 1, 0, 2, 0], 24); // ('nazwa animacji', [kolejność wyświetlania obrazków - w postaci ich indeksów w tablicy], liczba klatek na sekundę)
             ball.anchor.set(0.5); //kluczowym punktem piłki jest teraz jej środek
             game.physics.enable(ball, Phaser.Physics.ARCADE); //udostępnienie piłki do silnika
             ball.body.collideWorldBounds = true; //piłka nie przechodzi przez ściany
@@ -71,7 +73,7 @@
         }
         //update is executed on every frame
         function update() {
-            game.physics.arcade.collide(ball, paddle); //rakietka wykrywa zderzenie z piłką
+            game.physics.arcade.collide(ball, paddle, ballHitPaddle); //rakietka wykrywa zderzenie z piłką - uruchamia się funkcja ballHitPaddle
             game.physics.arcade.collide(ball, bricks, ballHitBrick); //trzeci opcjonalny parametr to funkcja ballHitBrick, która uruchamia się przy zderzeniu piłki z cegiełką
             paddle.x = game.input.x || game.world.width * 0.5; //pozycja rakietki wprowadzana jest przez użytkownika || startowa pozycja na środku planszy
         }
@@ -108,7 +110,14 @@
         }
 
         function ballHitBrick(ball, brick) {
-            brick.kill();
+            //Tweens zapewniają płynność animacji właściwości obiektu (tj. szerokość czy krycie)
+            var killTween = game.add.tween(brick.scale);
+            killTween.to({ x: 0, y: 0 }, 200, Phaser.Easing.Linear.None); //cegiełka nie znika od razu po uderzeniu, lecz kórczy się do 0, w czasie 200ms
+            killTween.onComplete.addOnce(function () {
+                brick.kill();
+            }, this);
+            killTween.start();
+
             score += 10;
             scoreText.setText('Points: ' + score);
 
@@ -141,6 +150,10 @@
                 alert('You lost, game over!');
                 location.reload();
             }
+        }
+
+        function ballHitPaddle(ball, paddle) {
+            ball.animations.play('wobble');
         }
     </script>
 </body>
