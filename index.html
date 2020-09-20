@@ -27,6 +27,10 @@
         let scoreText;
         let score = 0;
 
+        let lives = 3;
+        let livesText;
+        let lifeLostText;
+
         //preload takes care of preloading the assets
         function preload() {
             game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -48,11 +52,7 @@
             ball.body.bounce.set(1); //piłka odbija się od ścian (prędkość po odbiciu)
             ball.body.velocity.set(150, -150); //prędkość i kierunek
             ball.checkWorldBounds = true;
-            ball.events.onOutOfBounds.add(function () {
-                alert('Game over!');
-                location.reload();
-                console.log(this);
-            }, this); // jeśli piłka wpadnie w dolną ścianę to game over
+            ball.events.onOutOfBounds.add(ballLeaveScreen, this); // jeśli piłka wpadnie w dolną ścianę to game over
 
             paddle = game.add.sprite(game.world.width * 0.5, game.world.height - 5, 'paddle'); //rakietka na środku szerokości planszy i na wysokości mniejszej o 5 od wysokości planszy
             paddle.anchor.set(0.5, 1); //kluczowym punktem rakietki jest teraz jej środek, a nie lewy górny róg
@@ -60,7 +60,14 @@
             paddle.body.immovable = true; //rakietka nie opada po odbiciu piłki
 
             initBricks();
-            scoreText = game.add.text(5, 5, 'Points: 0', { font: '18px Arial', fill: '#0095DD' });
+            textStyle = { font: '18px Arial', fill: '#0095DD' };
+            scoreText = game.add.text(5, 5, 'Points: 0', textStyle);
+            //nasze życia:
+            livesText = game.add.text(game.world.width - 5, 5, 'Lives: ' + lives, textStyle);
+            livesText.anchor.set(1, 0);
+            lifeLostText = game.add.text(game.world.width * 0.5, game.world.height * 0.5, 'Life lost, click to continue', textStyle);
+            lifeLostText.anchor.set(0.5);
+            lifeLostText.visible = false; //widoczne tylko gdy tracimy życie (dlatego false)
         }
         //update is executed on every frame
         function update() {
@@ -113,6 +120,25 @@
             // sprawdzamy czy są jeszcze jakieś cegiełki
             if (count_alive == 0) {
                 alert('You won the game, congratulations!');
+                location.reload();
+            }
+        }
+
+        function ballLeaveScreen() {
+            //jeśli piłka spadnie w dolną granicę, to tracimy życie
+            lives--;
+            if (lives) {
+                livesText.setText('Lives: ' + lives);
+                lifeLostText.visible = true;
+                ball.reset(game.world.width * 0.5, game.world.height - 25);
+                paddle.reset(game.world.width * 0.5, game.world.height - 5);
+                game.input.onDown.addOnce(function () {
+                    lifeLostText.visible = false;
+                    ball.body.velocity.set(150, -150);
+                }, this);
+            }
+            else {
+                alert('You lost, game over!');
                 location.reload();
             }
         }
